@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+    parameters {
+        choice(name: 'CONTAINER', choices: ['my_container', 'my_other_container', 'yet_another_container'], description: '')
+    }
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    dir(“${CONTAINER}”) {
+                        sh "docker build --no-cache --network=host -t nexus.veliosystems.com:18081/${CONTAINER} ."
+                    }
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script {
+                    dir(“${CONTAINER}”) {
+                        sh "docker push  nexus.veliosystems.com:18081/${CONTAINER}”
+                    }
+                }
+            }
+        }
+
+    }
+}
